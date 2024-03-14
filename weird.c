@@ -19,9 +19,9 @@
  *        [*] qeueu supports operations: iterate(), lookahead()
  *        , lookaheadahead(), isempty()
  *      [*] implement run just print to stdout
+ *      [*] implement Error struct.
  *      [ ] write decaration for scan_tokens and it helpers and
  *      design the software architecture.
- *      [ ] implement Error struct.
  *      [ ] implement functions.
  *
  *  References:
