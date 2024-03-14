@@ -3,6 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+// constnts
+#define SIZE_MAX_LEXEME 2048
 
 typedef enum errortype {
   ERROR_RUNTIME,
@@ -38,15 +43,42 @@ typedef enum ETokenType {
 
 typedef struct token {
   ETokenType type;
-  char *lexeme;
+  char lexeme[SIZE_MAX_LEXEME];
   int line;
 } Token;
+
+
+// weird.h utility function declaratoins
+int file_wc(FILE *fileptr);
+// weird.h error function declaratoins
+void puterr(Error **error, EErrorType type, char *msg);
+void throwerr(Error *error);
+
+/* Gets the word count of the file at path by calling stdlib
+ * functions */
+int file_wc(FILE *fileptr) {
+  long tell;
+
+  fseek(fileptr, 0, SEEK_END);
+  tell = ftell(fileptr);
+  rewind(fileptr);
+
+  return (int)tell;
+}
 
 // ok for no error convention
 Error *ok = NULL;
 
-// weird.h function declaratoins
-void throwerr(Error *error);
+/* allocates memory and make an error ptr then puts it into
+ * arg error which passed by reference.
+ * example: puts runtime error in &error.
+ *  puterr(&error, ERROR_RUNTIME, "testing error now.");
+ * */
+void puterr(Error **error, EErrorType type, char *msg) {
+  (*error) = malloc(sizeof(Error));
+  (*error)->type = type;
+  (*error)->msg = msg;
+}
 
 /* prints error to stdout and exits with exit code 69 */
 void throwerr(Error *error) {
@@ -56,8 +88,10 @@ void throwerr(Error *error) {
 }
 
 // weird.c function declarations
-Error *scan_tokens(char *srcq, int qsize, int *start, int *end, int *qptr);
-int file_wc(FILE *fileptr);
+void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, ETokenType type);
+Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int start);
+Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize);
+void run(char *srcq, int qsize);
 void run_file(char *path);
 
 #endif

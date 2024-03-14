@@ -20,59 +20,105 @@
  *        , lookaheadahead(), isempty()
  *      [*] implement run just print to stdout
  *      [*] implement Error struct.
- *      [ ] write decaration for scan_tokens and it helpers and
+ *      [*] write decaration for scan_tokens and it helpers and
  *      design the software architecture.
- *      [ ] implement functions.
+ *      [*] implement functions.
  *
  *  References:
  * */
 
 #include "weird.h"
 
-/* Gets the word count of the file at path by calling stdlib
- * functions */
-int file_wc(FILE *fileptr) {
-  long tell;
+/* Creates a Token { struct token } put the right values in it 
+ * and the newly created token into tokens[] */
+void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, ETokenType type) {
+  int length = qptr - start;
 
-  fseek(fileptr, 0, SEEK_END);
-  tell = ftell(fileptr);
-  rewind(fileptr);
+  // declare token
+  Token token;
+  // put type
+  token.type = type;
+  // put lexeme
+  strncpy(token.lexeme, srcq + start, length);
+  token.lexeme[length] = '\0';
 
-  return (int)tell;
+  // put line
+  token.line = 0; // TODO
+
+  // append token to tokens[]
+  tokens[++(*tokensptr)] = token;
+}
+
+/* reads one token, checks if is correct token reads it 
+ * into tokens else populates the error with the right msg */
+Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int start) {
+  char c;
+  Error *error;
+
+  error = ok;
+  c = srcq[(*qptr)++];
+  switch (c) {
+    case '(':
+      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_LEFT_PAREN);
+      break;
+    case ')':
+      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
+      break;
+    case '{':
+      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
+      break;
+    case '}':
+      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
+      break;
+    case '\0':
+      break;
+    default:
+      if (isspace(c)) {
+        break;
+      }
+      else {
+        puterr(&error, ERROR_RUNTIME, "Unexpected Token.");
+        break;
+      }
+  }
+
+  return error;
 }
 
 /* Lexes src into tokens */
-Error *scan_tokens(char *srcq, int qsize, int *start, int *end, int *qptr) {
+Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize) {
   Error *error;
+  int start, qptr;
 
-  // init error
-  error = ok;
+  start = 0;
+  qptr = 0;
+
+  while (qptr <= qsize) { // while not queue end
+    start = qptr;
+    if ((error = scan_token(tokens, tokensptr, srcq, &qptr, start)) != ok) {
+      throwerr(error);
+    }
+  }
 
   // set the error
-  error = malloc(sizeof(Error));
-  error->type = ERROR_RUNTIME;
-  error->msg = "testing error now.";
-
   return error;
 }
 
-Error *run(char *srcq, int qsize) {
+/* run the code in srcq source queue */
+void run(char *srcq, int qsize) {
+  int tokensptr;
   Error *error;
-  int start, end, qptr;
-
-  error = ok;
-
-  start = 0;
-  end = 0;
-  qptr = start;
-
-  if ((error = scan_tokens(srcq, qsize, &start, &end, &qptr)) != ok)
+  Token tokens[qsize]; // in worst case, each char is a token.
+  
+  // Sacn tokens while handling error.
+  error = ok, tokensptr = -1; // init error , init tokensptr.
+  if ((error = scan_tokens(tokens, &tokensptr, srcq, qsize)) != ok)
     throwerr(error);
 
-  while (qptr <= qsize)
-    fputc((int) srcq[qptr++], stdout);
-
-  return error;
+  // for now, print the tokens
+  printf("tokens: \n");
+  while (tokensptr >= 0)
+    printf("\t<%s>", tokens[tokensptr--].lexeme);
 }
 
 /* Compile and runs the code in a file */
@@ -89,24 +135,17 @@ void run_file(char *path) {
   srcq[filesize] = '\0'; // null terminator at end
 
   // read file's content into srcq
-  c = fgetc(fileptr), qsize = 0;
+  c = fgetc(fileptr), qsize = -1;
   while (c != EOF) {
-    srcq[qsize++] = c;
+    srcq[++qsize] = c;
     c = fgetc(fileptr);
   }
   fclose(fileptr); // done with file
   // run
-  Error *error;
-  if ((error = run(srcq, qsize)) != ok) {
-    throwerr(error); 
-  }
+  run(srcq, qsize);
 }
 
 int main(int argc, char **argv) {
-  int filewc;
-
-  // get number of char in words to read
-
   if (argc == 1) {
     // run interpreter
   }
