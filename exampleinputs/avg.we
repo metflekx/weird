@@ -1,0 +1,4 @@
+var a = 20
+var b = 10
+
+var avg = (a + b) / 2
