@@ -1,5 +1,5 @@
 /*
- *  file: main.c
+ *  file: weird.c
  *
  *  brief:
  *    -An interpreter for a language called weird compiles the .we
@@ -7,6 +7,8 @@
  *    book "crafting-interpreters" and consists of functions that
  *    do lexical analysis, parseing, and hopefully IR and 
  *    code gen. phases.
+ *
+ *    this repo consists of weird.c, weird.h and scan_token.h .
  *    
  *    examples of the valid weird source code exist in this
  *    repository; their name ends with '.we'.
@@ -15,16 +17,14 @@
  *
  *  todo:
  *    [ ] Lexical Analysis:
- *      [*] read a file into a queue of bytes: srcqueue
- *        [*] qeueu supports operations: iterate(), lookahead()
- *        , lookaheadahead(), isempty()
- *      [*] implement run just print to stdout
- *      [*] implement Error struct.
- *      [*] write decaration for scan_tokens and it helpers and
- *      design the software architecture.
- *      [*] implement functions.
+ *      [*] Successfully tokenize a file consist of "!*+-/=<> <= == // ops".
+ *      [ ] Successfully tokenize string literals.
+ *      [ ] Successfully tokenize number literals.
+ *      [ ] Successfully tokenize res. keywords and identifiers.
+ *      [ ] for each token, keep track of line.
  *
  *  References:
+ *    TODO
  * */
 
 #include "weird.h"
@@ -49,42 +49,6 @@ void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, 
   tokens[++(*tokensptr)] = token;
 }
 
-/* reads one token, checks if is correct token reads it 
- * into tokens else populates the error with the right msg */
-Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int start) {
-  char c;
-  Error *error;
-
-  error = ok;
-  c = srcq[(*qptr)++];
-  switch (c) {
-    case '(':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_LEFT_PAREN);
-      break;
-    case ')':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
-      break;
-    case '{':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
-      break;
-    case '}':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
-      break;
-    case '\0':
-      break;
-    default:
-      if (isspace(c)) {
-        break;
-      }
-      else {
-        puterr(&error, ERROR_RUNTIME, "Unexpected Token.");
-        break;
-      }
-  }
-
-  return error;
-}
-
 /* Lexes src into tokens */
 Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize) {
   Error *error;
@@ -95,7 +59,7 @@ Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize) {
 
   while (qptr <= qsize) { // while not queue end
     start = qptr;
-    if ((error = scan_token(tokens, tokensptr, srcq, &qptr, start)) != ok) {
+    if ((error = scan_token(tokens, tokensptr, srcq, &qptr, qsize, start)) != ok) {
       throwerr(error);
     }
   }

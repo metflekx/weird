@@ -47,7 +47,6 @@ typedef struct token {
   int line;
 } Token;
 
-
 // weird.h utility function declaratoins
 int file_wc(FILE *fileptr);
 // weird.h error function declaratoins
@@ -80,18 +79,20 @@ void puterr(Error **error, EErrorType type, char *msg) {
   (*error)->msg = msg;
 }
 
-/* prints error to stdout and exits with exit code 69 */
+/* prints error to stdout and exits with exit code 65 */
 void throwerr(Error *error) {
   printf("error:\n\t%s\n", error->msg);
   free(error);
   exit(65);
 }
 
-// weird.c function declarations
+// function declarations
 void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, ETokenType type);
-Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int start);
+Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int qsize, int start);
 Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize);
 void run(char *srcq, int qsize);
 void run_file(char *path);
+
+#include "scan_token.h"
 
 #endif
