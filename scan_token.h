@@ -87,9 +87,9 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
           tokens, tokensptr, srcq, *qptr, start, 
           TOKEN_GREATER);
       break;
-    case '/':
+    case '/': // Handling comments and Division
       if (*qptr <= qsize && srcq[(*qptr)] == '/') {
-        while(srcq[(*qptr)] != '\n') {
+        while(*qptr <= qsize && srcq[(*qptr)] != '\n') {
           (*qptr)++;
         }
       }
@@ -99,12 +99,43 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
             TOKEN_SLASH);
       }
       break;
+    case '"': // Handling string literals
+      while (*qptr <= qsize && srcq[*qptr] != '"') {
+        (*qptr)++;
+      }
+      if (*qptr > qsize) { // unfinished str but ptr at end
+        puterr(&error, ERROR_RUNTIME, 
+            "Unterminated String Literal.");
+      }
+      else {
+        put_token(
+            tokens, tokensptr, srcq, ++(*qptr), start, 
+            TOKEN_STRING);
+      }
+      break;
     default:
+      if (isdigit(c)) { // Handle numeric literals
+        // Read and iterate src queue while numeric.
+        while (*qptr <= qsize && isdigit(srcq[(*qptr)++]))
+          ;
+        // Handle floats
+        if (*qptr <= qsize && srcq[(*qptr)-1] == '.') {
+          while (*qptr <= qsize && isdigit(srcq[(*qptr)++]))
+            ;
+        }
+        (*qptr)--; // While loop had to lookahead
+
+        put_token( // Put the numeric literal token.
+            tokens, tokensptr, srcq, *qptr, start,
+            TOKEN_NUMBER);
+
+        break;
+      }
       if (isspace(c)) {
         break;
       }
       else {
-        puterr(&error, ERROR_RUNTIME, "Unexpected Token.");
+        puterr(&error, ERROR_RUNTIME, "Unexpected token.");
         break;
       }
   }

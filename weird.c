@@ -18,8 +18,8 @@
  *  todo:
  *    [ ] Lexical Analysis:
  *      [*] Successfully tokenize a file consist of "!*+-/=<> <= == // ops".
- *      [ ] Successfully tokenize string literals.
- *      [ ] Successfully tokenize number literals.
+ *      [*] Successfully tokenize string literals.
+ *      [*] Successfully tokenize number literals.
  *      [ ] Successfully tokenize res. keywords and identifiers.
  *      [ ] for each token, keep track of line.
  *
@@ -62,7 +62,8 @@ Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq,
 
   while (qptr <= qsize) { // while not queue end
     start = qptr;
-    if ((error = scan_token(tokens, tokensptr, srcq, &qptr, qsize, start)) != ok) {
+    if ((error = scan_token(
+            tokens, tokensptr, srcq, &qptr, qsize, start)) != ok) {
       throwerr(error);
     }
   }
