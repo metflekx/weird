@@ -31,8 +31,11 @@
 
 /* Creates a Token { struct token } put the right values in it 
  * and the newly created token into tokens[] */
-void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, ETokenType type) {
-  int length = qptr - start;
+void put_token(Token tokens[], int *tokensptr, char *srcq,
+    int qptr, int start, ETokenType type) {
+  int length;
+  // obtain length of lexeme
+  length = qptr - start;
 
   // declare token
   Token token;
@@ -41,7 +44,6 @@ void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, 
   // put lexeme
   strncpy(token.lexeme, srcq + start, length);
   token.lexeme[length] = '\0';
-
   // put line
   token.line = 0; // TODO
 
@@ -50,7 +52,8 @@ void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, 
 }
 
 /* Lexes src into tokens */
-Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize) {
+Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, 
+    int qsize) {
   Error *error;
   int start, qptr;
 
@@ -76,7 +79,8 @@ void run(char *srcq, int qsize) {
   
   // Sacn tokens while handling error.
   error = ok, tokensptr = -1; // init error , init tokensptr.
-  if ((error = scan_tokens(tokens, &tokensptr, srcq, qsize)) != ok)
+  if ((error = scan_tokens(
+          tokens, &tokensptr, srcq, qsize)) != ok)
     throwerr(error);
 
   // for now, print the tokens

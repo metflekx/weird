@@ -87,9 +87,12 @@ void throwerr(Error *error) {
 }
 
 // function declarations
-void put_token(Token tokens[], int *tokensptr, char *srcq, int qptr, int start, ETokenType type);
-Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int qsize, int start);
-Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, int qsize);
+void put_token(Token tokens[], int *tokensptr, char *srcq, 
+    int qptr, int start, ETokenType type);
+Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
+    int *qptr, int qsize, int start);
+Error *scan_tokens(Token tokens[], int *tokensptr, 
+    char *srcq, int qsize);
 void run(char *srcq, int qsize);
 void run_file(char *path);
 

@@ -3,7 +3,8 @@
 
 /* reads one token, checks if is correct token reads it 
  * into tokens else populates the error with the right msg */
-Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int qsize, int start) {
+Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
+    int *qptr, int qsize, int start) {
   char c;
   Error *error;
 
@@ -11,62 +12,80 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int qsi
   c = srcq[(*qptr)++];
   switch (c) {
     case '(':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_LEFT_PAREN);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_LEFT_PAREN);
       break;
     case ')':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_RIGHT_PAREN);
       break;
     case '{':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_RIGHT_PAREN);
       break;
     case '}':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_RIGHT_PAREN);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_RIGHT_PAREN);
       break;
     case ',':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_COMMA);
+      put_token(tokens, tokensptr, srcq, *qptr, start,
+          TOKEN_COMMA);
       break;
     case '.':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_DOT);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_DOT);
       break;
     case '-':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_MINUS);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_MINUS);
       break;
     case '+':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_PLUS);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_PLUS);
       break;
     case ';':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_SEMICOLON);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_SEMICOLON);
       break;
     case '*':
-      put_token(tokens, tokensptr, srcq, *qptr, start, TOKEN_STAR);
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_STAR);
       break;
     case '!': // check if the lexeme is continued '!=' or just '!'.
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, TOKEN_BANG_EQUAL):
+          tokens, tokensptr, srcq, ++(*qptr), start, 
+          TOKEN_BANG_EQUAL):
       put_token(
-          tokens, tokensptr, srcq, *qptr, start, TOKEN_BANG);
+          tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_BANG);
       break;
     case '=':
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, TOKEN_EQUAL_EQUAL):
+          tokens, tokensptr, srcq, ++(*qptr), start, 
+          TOKEN_EQUAL_EQUAL):
       put_token(
-          tokens, tokensptr, srcq, *qptr, start, TOKEN_EQUAL);
+          tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_EQUAL);
       break;
     case '<':
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, TOKEN_LESS_EQUAL):
+          tokens, tokensptr, srcq, ++(*qptr), start, 
+          TOKEN_LESS_EQUAL):
       put_token(
-          tokens, tokensptr, srcq, *qptr, start, TOKEN_LESS);
+          tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_LESS);
       break;
     case '>':
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, TOKEN_GREATER_EQUAL):
+          tokens, tokensptr, srcq, ++(*qptr), start, 
+          TOKEN_GREATER_EQUAL):
       put_token(
-          tokens, tokensptr, srcq, *qptr, start, TOKEN_GREATER);
+          tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_GREATER);
       break;
     case '/':
       if (*qptr <= qsize && srcq[(*qptr)] == '/') {
@@ -76,7 +95,8 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq, int *qptr, int qsi
       }
       else {
         put_token(
-            tokens, tokensptr, srcq, *qptr, start, TOKEN_SLASH);
+            tokens, tokensptr, srcq, *qptr, start, 
+            TOKEN_SLASH);
       }
       break;
     default:
