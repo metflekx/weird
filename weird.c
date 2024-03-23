@@ -16,17 +16,22 @@
  *  Author: Metflekx
  *
  *  todo:
- *    [ ] Lexical Analysis:
+ *    [*] Lexical Analysis:
  *      [*] Successfully tokenize a file consist of "!*+-/=<> <= == // ops".
  *      [*] Successfully tokenize string literals.
  *      [*] Successfully tokenize number literals.
  *      [*] Successfully tokenize res. keywords and identifiers.
- *      [ ] for each token, keep track of line.
- *      [ ] error should stdout token's line and lexeme.
- *      [ ] Implement Repl.
+ *      [*] for each token, keep track of line.
+ *      [*] error should stdout token's line and lexeme.
+ *      [*] Implement Repl.
  *
  *  References:
- *    TODO
+ *    Notes:
+ *    how to throw error correctly from whitin scan_token():
+ *    where c is current char that is being read.
+ *      char msg[ERROR_MAX_MSG];
+ *      puterrmsg(msg, "Unexpected Token", c, *line);
+ *      puterr(&error, ERROR_RUNTIME, msg);
  * */
 
 #include "weird.h"
@@ -34,7 +39,7 @@
 /* Creates a Token { struct token } put the right values in it 
  * and the newly created token into tokens[] */
 void put_token(Token tokens[], int *tokensptr, char *srcq,
-    int qptr, int start, ETokenType type) {
+    int qptr, int start, ETokenType type, int line) {
   int length;
   // obtain length of lexeme
   length = qptr - start;
@@ -47,7 +52,7 @@ void put_token(Token tokens[], int *tokensptr, char *srcq,
   strncpy(token.lexeme, srcq + start, length);
   token.lexeme[length] = '\0';
   // put line
-  token.line = 0; // TODO
+  token.line = line;
 
   // append token to tokens[]
   tokens[++(*tokensptr)] = token;
@@ -57,15 +62,16 @@ void put_token(Token tokens[], int *tokensptr, char *srcq,
 Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq, 
     int qsize) {
   Error *error;
-  int start, qptr;
+  int start, qptr, line;
 
   start = 0;
   qptr = 0;
+  line = 1;
 
   while (qptr <= qsize) { // while not queue end
     start = qptr;
     if ((error = scan_token(
-            tokens, tokensptr, srcq, &qptr, qsize, start)) != ok) {
+            tokens, tokensptr, srcq, &qptr, qsize, start, &line)) != ok) {
       throwerr(error);
     }
   }
@@ -79,19 +85,12 @@ void run(char *srcq, int qsize) {
   int tokensptr;
   Error *error;
   Token tokens[qsize]; // in worst case, each char is a token.
-  printf("%s\n size: %i\n", srcq, qsize);
   
   // Sacn tokens while handling error.
   error = ok, tokensptr = -1; // init error , init tokensptr.
   if ((error = scan_tokens(
           tokens, &tokensptr, srcq, qsize)) != ok)
     throwerr(error);
-
-  // for now, print the tokens
-  printf("tokens: \n");
-  while (tokensptr >= 0)
-    printf("\t<%s>", tokens[tokensptr--].lexeme);
-  printf("\n");
 }
 
 /* Compile and runs the code in a file */

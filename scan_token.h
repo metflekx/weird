@@ -4,7 +4,7 @@
 /* reads one token, checks if is correct token reads it 
  * into tokens else populates the error with the right msg */
 Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
-    int *qptr, int qsize, int start) {
+    int *qptr, int qsize, int start, int *line) {
   char c;
   Error *error;
 
@@ -13,79 +13,79 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
   switch (c) {
     case '(':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_LEFT_PAREN);
+          TOKEN_LEFT_PAREN, *line);
       break;
     case ')':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_RIGHT_PAREN);
+          TOKEN_RIGHT_PAREN, *line);
       break;
     case '{':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_RIGHT_PAREN);
+          TOKEN_RIGHT_PAREN, *line);
       break;
     case '}':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_RIGHT_PAREN);
+          TOKEN_RIGHT_PAREN, *line);
       break;
     case ',':
       put_token(tokens, tokensptr, srcq, *qptr, start,
-          TOKEN_COMMA);
+          TOKEN_COMMA, *line);
       break;
     case '.':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_DOT);
+          TOKEN_DOT, *line);
       break;
     case '-':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_MINUS);
+          TOKEN_MINUS, *line);
       break;
     case '+':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_PLUS);
+          TOKEN_PLUS, *line);
       break;
     case ';':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_SEMICOLON);
+          TOKEN_SEMICOLON, *line);
       break;
     case '*':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_STAR);
+          TOKEN_STAR, *line);
       break;
     case '!': // check if the lexeme is continued '!=' or just '!'.
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
           tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_BANG_EQUAL):
+          TOKEN_BANG_EQUAL, *line):
       put_token(
           tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_BANG);
+          TOKEN_BANG, *line);
       break;
     case '=':
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
           tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_EQUAL_EQUAL):
+          TOKEN_EQUAL_EQUAL, *line):
       put_token(
           tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_EQUAL);
+          TOKEN_EQUAL, *line);
       break;
     case '<':
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
           tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_LESS_EQUAL):
+          TOKEN_LESS_EQUAL, *line):
       put_token(
           tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_LESS);
+          TOKEN_LESS, *line);
       break;
     case '>':
       (*qptr <= qsize && srcq[(*qptr)] == '=')?
       put_token(
           tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_GREATER_EQUAL):
+          TOKEN_GREATER_EQUAL, *line):
       put_token(
           tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_GREATER);
+          TOKEN_GREATER, *line);
       break;
     case '/': // Handling comments and Division
       if (*qptr <= qsize && srcq[(*qptr)] == '/') {
@@ -96,7 +96,7 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
       else {
         put_token(
             tokens, tokensptr, srcq, *qptr, start, 
-            TOKEN_SLASH);
+            TOKEN_SLASH, *line);
       }
 
       break;
@@ -106,13 +106,15 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
       }
 
       if (*qptr > qsize) { // unfinished str but ptr at end
-        puterr(&error, ERROR_RUNTIME, 
-            "Unterminated String Literal.");
+        char msg[ERROR_MAX_MSG];
+        puterrmsg(
+            msg, "Unterminated String Literal", c, *line);
+        puterr(&error, ERROR_RUNTIME, msg);
       }
       else {
         put_token(
             tokens, tokensptr, srcq, ++(*qptr), start, 
-            TOKEN_STRING);
+            TOKEN_STRING, *line);
       }
 
       break;
@@ -131,7 +133,7 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
 
         put_token( // Put the numeric literal token.
             tokens, tokensptr, srcq, *qptr, start,
-            TOKEN_NUMBER);
+            TOKEN_NUMBER, *line);
 
         break;
       }
@@ -153,21 +155,27 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
         if ((kword = kmaplookup(kmap, substr))) {  
           put_token(
               tokens, tokensptr, srcq, *qptr, start, 
-              kword->type);
+              kword->type, *line);
         }
         else { // Is an identifier
           put_token(
               tokens, tokensptr, srcq, *qptr, start, 
-              TOKEN_IDENTIFIER);
+              TOKEN_IDENTIFIER, *line);
         }
         break;
       }
 
       if (isspace(c)) {
+        if (c == '\n') {
+          (*line)++;
+        }
         break;
       }
       else {
-        puterr(&error, ERROR_RUNTIME, "Unexpected token.");
+        // Put Error
+        char msg[ERROR_MAX_MSG];
+        puterrmsg(msg, "Unexpected Token", c, *line);
+        puterr(&error, ERROR_RUNTIME, msg);
         break;
       }
   }

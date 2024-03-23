@@ -9,6 +9,7 @@
 #define SIZE_MAX_LEXEME 2048
 #define REPL_MAX_LINE 512
 #define REPL_ENDL "\n\r"
+#define ERROR_MAX_MSG 512
 
 typedef enum errortype {
   ERROR_RUNTIME,
@@ -17,7 +18,7 @@ typedef enum errortype {
 
 typedef struct error {
   EErrorType type;
-  char *msg; // consists of line
+  char msg[ERROR_MAX_MSG];
 } Error;
 
 typedef struct token {
@@ -29,7 +30,8 @@ typedef struct token {
 // weird.h utility function declaratoins
 int file_wc(FILE *fileptr);
 // weird.h error function declaratoins
-void puterr(Error **error, EErrorType type, char *msg);
+void puterrmsg(char src[], char *msg, char token, int line);
+void puterr(Error **error, EErrorType type, char msg[]);
 void throwerr(Error *error);
 
 /* Gets the word count of the file at path by calling stdlib
@@ -47,15 +49,31 @@ int file_wc(FILE *fileptr) {
 // ok for no error convention
 Error *ok = NULL;
 
+/* Generates error readable error msg puts into src.
+ * Just a few boring stdlib calls. */
+void puterrmsg(char src[], char *msg, char token, int line) {
+  char buff[10];
+  int i = 0;
+  strcpy(src, msg); //"Unexpected Token: \'");
+  strcat(src, ": \'");
+  sprintf(buff, "%d", line); // itoa
+  while (src[i++] != '\0')
+    ;
+  src[i - 1] = token;
+  src[i] = '\0';
+  strcat(src, "\' At Line: ");
+  strcat(src, buff);
+}
+
 /* allocates memory and make an error ptr then puts it into
  * arg error which passed by reference.
  * example: puts runtime error in &error.
  *  puterr(&error, ERROR_RUNTIME, "testing error now.");
  * */
-void puterr(Error **error, EErrorType type, char *msg) {
+void puterr(Error **error, EErrorType type, char msg[]) {
   (*error) = malloc(sizeof(Error));
   (*error)->type = type;
-  (*error)->msg = msg;
+  strcpy((*error)->msg, msg);
 }
 
 /* prints error to stdout and exits with exit code 65 */
@@ -67,9 +85,9 @@ void throwerr(Error *error) {
 
 // function declarations
 void put_token(Token tokens[], int *tokensptr, char *srcq, 
-    int qptr, int start, ETokenType type);
-Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
-    int *qptr, int qsize, int start);
+    int qptr, int start, ETokenType type, int line);
+Error *scan_token(Token tokens[], int *tokensptr,
+    char *srcq, int *qptr, int qsize, int start, int *line);
 Error *scan_tokens(Token tokens[], int *tokensptr, 
     char *srcq, int qsize);
 void run(char *srcq, int qsize);
