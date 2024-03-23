@@ -20,8 +20,10 @@
  *      [*] Successfully tokenize a file consist of "!*+-/=<> <= == // ops".
  *      [*] Successfully tokenize string literals.
  *      [*] Successfully tokenize number literals.
- *      [ ] Successfully tokenize res. keywords and identifiers.
+ *      [*] Successfully tokenize res. keywords and identifiers.
  *      [ ] for each token, keep track of line.
+ *      [ ] error should stdout token's line and lexeme.
+ *      [ ] Implement Repl.
  *
  *  References:
  *    TODO
@@ -115,6 +117,8 @@ void run_file(char *path) {
 }
 
 int main(int argc, char **argv) {
+  kmapinit(); // Initialize kmap keywords lookup table
+
   if (argc == 1) {
     // run interpreter
   }

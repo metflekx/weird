@@ -98,11 +98,13 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
             tokens, tokensptr, srcq, *qptr, start, 
             TOKEN_SLASH);
       }
+
       break;
     case '"': // Handling string literals
       while (*qptr <= qsize && srcq[*qptr] != '"') {
         (*qptr)++;
       }
+
       if (*qptr > qsize) { // unfinished str but ptr at end
         puterr(&error, ERROR_RUNTIME, 
             "Unterminated String Literal.");
@@ -112,12 +114,14 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
             tokens, tokensptr, srcq, ++(*qptr), start, 
             TOKEN_STRING);
       }
+
       break;
     default:
       if (isdigit(c)) { // Handle numeric literals
         // Read and iterate src queue while numeric.
         while (*qptr <= qsize && isdigit(srcq[(*qptr)++]))
           ;
+
         // Handle floats
         if (*qptr <= qsize && srcq[(*qptr)-1] == '.') {
           while (*qptr <= qsize && isdigit(srcq[(*qptr)++]))
@@ -131,6 +135,34 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
 
         break;
       }
+
+      // Handle Identifiers and Keywords
+      if (isalpha(c)) {
+        while (*qptr <= qsize && isalnum(srcq[(*qptr)++]))
+          ;
+        (*qptr)--; // while had to lookahead
+        
+        // Get Substr check if is keyword Else is identifier
+        int length = *qptr - start; // length of substr
+        char substr[length];
+        Keyword *kword;
+        strncpy(substr, srcq + start, length);
+        substr[length] = '\0'; // null terminated substr
+        
+        // Check if kword
+        if ((kword = kmaplookup(kmap, substr))) {  
+          put_token(
+              tokens, tokensptr, srcq, *qptr, start, 
+              kword->type);
+        }
+        else { // Is an identifier
+          put_token(
+              tokens, tokensptr, srcq, *qptr, start, 
+              TOKEN_IDENTIFIER);
+        }
+        break;
+      }
+
       if (isspace(c)) {
         break;
       }
