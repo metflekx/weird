@@ -96,7 +96,7 @@ void _initkmap(Keyword *kmap[]) {
 
 /* put a keyword to kmap, Linear probing. */
 void kmapput(Keyword *kmap[], Keyword *keyword) {
-  int i, index;
+  int index;
   Keyword *iterator;
 
   index = _hash(keyword->key);
@@ -168,7 +168,6 @@ Keyword **kmapinit() {
     "true", "var", "while", "error", "eof"};
 
   _initkmap(kmap);
-  printf("from %i to %i\n", TOKEN_AND, TOKEN_EOF);
   for (j = 0, i = TOKEN_AND; i <= TOKEN_EOF; j++, i++) {
     kmapput(kmap, _kword(kwords[j], i));
   }
