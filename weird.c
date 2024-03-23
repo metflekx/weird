@@ -79,6 +79,7 @@ void run(char *srcq, int qsize) {
   int tokensptr;
   Error *error;
   Token tokens[qsize]; // in worst case, each char is a token.
+  printf("%s\n size: %i\n", srcq, qsize);
   
   // Sacn tokens while handling error.
   error = ok, tokensptr = -1; // init error , init tokensptr.
@@ -90,6 +91,7 @@ void run(char *srcq, int qsize) {
   printf("tokens: \n");
   while (tokensptr >= 0)
     printf("\t<%s>", tokens[tokensptr--].lexeme);
+  printf("\n");
 }
 
 /* Compile and runs the code in a file */
@@ -116,11 +118,36 @@ void run_file(char *path) {
   run(srcq, qsize);
 }
 
+/* Runs the interactive weird. Reads and runs one-line at a 
+ * time from stdin */
+void repl() {
+  printf("Interactive weird.\nenter @ to quit.\n");
+  int size = 0;
+  char c, srcq[REPL_MAX_LINE];
+  while (1) {
+    printf("~> ");
+    while ((c = getchar()) != '\n') {
+      if (c == '@') {
+        return;
+      }
+      else {
+        srcq[size++] = c;
+      }
+    }
+    strcat(srcq, REPL_ENDL);
+    run(srcq, size);
+    bzero(srcq, size);
+    size = 0;
+  }
+}
+
 int main(int argc, char **argv) {
   kmapinit(); // Initialize kmap keywords lookup table
-
+  
   if (argc == 1) {
-    // run interpreter
+    // run interactive mode
+    repl();
+    return 0;
   }
   else if (argc == 2) {
     // run file

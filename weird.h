@@ -7,6 +7,8 @@
 
 // constnts
 #define SIZE_MAX_LEXEME 2048
+#define REPL_MAX_LINE 512
+#define REPL_ENDL "\n\r"
 
 typedef enum errortype {
   ERROR_RUNTIME,
@@ -72,6 +74,7 @@ Error *scan_tokens(Token tokens[], int *tokensptr,
     char *srcq, int qsize);
 void run(char *srcq, int qsize);
 void run_file(char *path);
+void repl();
 
 #include "scan_token.h"
 
