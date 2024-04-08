@@ -1,3 +1,84 @@
+/*
+* *********************DOCUMENTATION************************
+* ----------------------------------------------------------
+*  @header: 
+*         unsigned int _hash(char *key)
+*  @brief: 
+*         Calcluates a hash value based on the input key.
+*         The resulting hash value is used to determine the index
+*         in hash map where the key-value pair will be stored.
+*  @param *key:
+*         A string input for which the hash value is to be calculated.
+*  @ret:
+*         A randomly generated key for the hash.
+* ----------------------------------------------------------
+*  @header:
+*         void _print(Keyword *kmap[])
+*  @brief:
+*         Prints the keyword hash map to stdout. If there is no keyword
+*         at an index, "---" is printed.
+*  @param *kmap:
+*         An array of pointers representing the hash map.
+*  @ret:
+*         Void.
+* ----------------------------------------------------------
+*  @header:
+*         void _initkmap(Keyword *kmap[])
+*  @brief:
+*         Initialise the hashmap to point to null, instead of some 
+*         garbage values.
+*  @param *kmap:
+*         An array of pointers representing the hash map.
+*  @ret:
+*         Void.
+* ----------------------------------------------------------      
+* @header:
+*         void kmapput(Keyword *kmap[], Keyword *keyword)
+* @brief:
+*         Stores the keyword in the hash map by finding an empty index in
+*         the array.
+* @param *kmap:
+*         An array of pointers representing the hash map.
+* @param *keyword:
+*         The keyword which needs to be stored in the hash map.
+* @ret:
+*         Void.
+* ----------------------------------------------------------
+* @header:
+*         Keyword *kmaplookup(Keyword *kmap[], char *query)
+* @brief:
+*         Looks for the given query (key) in the hash map, and retrieves it.
+* @param *kmap:
+*         An array of pointers representing the hash map.
+* @param *query:
+*         A string representing the data to retrieve from the hash map.
+* @ret:
+*         If the keyword is found in the hash map, a pointer to the keyword is 
+*         returned, else NULL is returned.
+* ----------------------------------------------------------
+* @header:
+*         Keyword *kmaprm(Keyword *kmap[], char *query)
+* @brief:
+*         Looks for the given query (key) in the hash map, and deletes it.
+* @param *kmap:
+*         An array of pointers representing the hash map.
+* @param *query:
+*         A string representing the data to delete from the hash map.
+* @ret:
+*         If the keyword is found in the hash map, a pointer to the keyword is 
+*         returned and the keyword is deleted, else NULL is returned.
+* ----------------------------------------------------------
+* @header:
+*         Keyword **kmapinit()
+* @brief:
+*         Initialises the hash map with predefined legal keywords.
+* @ret:
+*       A pointer to the initailised hash map.
+* ----------------------------------------------------------
+*
+*/
+
+
 #ifndef kmap_h
 #define kmap_h
 
