@@ -1,3 +1,57 @@
+/*
+* *********************DOCUMENTATION************************
+* ----------------------------------------------------------
+* @header:
+*         int file_wc(FILE *fileptr)
+* @brief:
+*         Determines the size of the file in bytes.
+* @param fileptr:
+*         Input file to measure it's size.
+* @ret:
+*         Size of the file in bytes.
+* ----------------------------------------------------------
+* @header:
+*         void puterrmsg(char src[], char *msg, char token, int line)
+* @brief:
+*         Generates error (readable) message and puts into src array. 
+* @param src:
+*         The location for the error message message to be stored.
+* @param msg:
+*         The error message.
+* @param token:
+*         The specific token that caused the error.
+* @param line:
+*         The line number where the error is.
+* @ret:
+*         Void.
+* ----------------------------------------------------------
+* @header:
+*         void puterr(Error **error, EErrorType type, char msg[])
+* @brief:
+*         Allocates memory and make an error pointer then puts it 
+*         into argument error which passed by reference.
+* @param **error:
+*         Address of the allocated memory to the error.
+* @param type:
+*         The type of the error.
+* @param msg:
+*         The error message.
+* @ret:
+*         Void.
+* ----------------------------------------------------------
+* @header:
+*         void throwerr(Error *error)
+* @brief:
+*         Prints error to stdout and exits with exit code 65.
+* @param *error:
+*         A pointer to an Error struct containing the error message.
+* @ret:
+*         Void.
+* ----------------------------------------------------------
+*
+*/
+
+
 #ifndef WEIRD_H
 #define WEIRD_H
 
