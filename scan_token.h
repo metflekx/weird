@@ -1,3 +1,17 @@
+/* 
+ *  file: scan_token.h
+ *
+ *  brief:
+ *    - A component of PL/0 lexer.
+ *    By Iterating thru queue of ascii characters 
+ *    containing the raw content of a file while 
+ *    keep tracking of the current line. scans 
+ *    each token according to PL/0 grammer: 
+ *
+ *  Author: Metflekx
+ * */
+
+
 #ifndef SCAN_TOKEN_H
 #define SCAN_TOKEN_H
 
@@ -11,126 +25,90 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
   error = ok;
   c = srcq[(*qptr)++];
   switch (c) {
-    case '(':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_LEFT_PAREN, *line);
-      break;
-    case ')':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_RIGHT_PAREN, *line);
-      break;
-    case '{':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_RIGHT_PAREN, *line);
-      break;
-    case '}':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_RIGHT_PAREN, *line);
-      break;
-    case ',':
-      put_token(tokens, tokensptr, srcq, *qptr, start,
-          TOKEN_COMMA, *line);
+    case '{': // Handle comments
+      while (srcq[(*qptr)++] != '}') {
+        if (*qptr > qsize) { // EOF
+          char msg[ERROR_MAX_MSG];
+          puterrmsg(msg, "Unterminated Comment.", c, *line);
+          puterr(&error, ERROR_RUNTIME, msg);
+        }
+        if (srcq[*qptr] == '\n') { // new line
+          (*line)++;
+        }
+      }
       break;
     case '.':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
           TOKEN_DOT, *line);
       break;
-    case '-':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_MINUS, *line);
+    case '=':
+      put_token(
+          tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_EQUAL, *line);
       break;
-    case '+':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_PLUS, *line);
+    case ',':
+      put_token(tokens, tokensptr, srcq, *qptr, start,
+          TOKEN_COMMA, *line);
       break;
     case ';':
       put_token(tokens, tokensptr, srcq, *qptr, start, 
           TOKEN_SEMICOLON, *line);
       break;
-    case '*':
-      put_token(tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_STAR, *line);
-      break;
-    case '!': // check if the lexeme is continued '!=' or just '!'.
-      (*qptr <= qsize && srcq[(*qptr)] == '=')?
-      put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_BANG_EQUAL, *line):
-      put_token(
-          tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_BANG, *line);
-      break;
-    case '=':
-      (*qptr <= qsize && srcq[(*qptr)] == '=')?
-      put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_EQUAL_EQUAL, *line):
-      put_token(
-          tokens, tokensptr, srcq, *qptr, start, 
-          TOKEN_EQUAL, *line);
+    case '#':
       break;
     case '<':
-      (*qptr <= qsize && srcq[(*qptr)] == '=')?
-      put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_LESS_EQUAL, *line):
       put_token(
           tokens, tokensptr, srcq, *qptr, start, 
           TOKEN_LESS, *line);
       break;
     case '>':
-      (*qptr <= qsize && srcq[(*qptr)] == '=')?
-      put_token(
-          tokens, tokensptr, srcq, ++(*qptr), start, 
-          TOKEN_GREATER_EQUAL, *line):
       put_token(
           tokens, tokensptr, srcq, *qptr, start, 
           TOKEN_GREATER, *line);
       break;
-    case '/': // Handling comments and Division
-      if (*qptr <= qsize && srcq[(*qptr)] == '/') {
-        while(*qptr <= qsize && srcq[(*qptr)] != '\n') {
-          (*qptr)++;
-        }
-      }
-      else {
-        put_token(
-            tokens, tokensptr, srcq, *qptr, start, 
-            TOKEN_SLASH, *line);
-      }
-
+    case '+':
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_PLUS, *line);
       break;
-    case '"': // Handling string literals
-      while (*qptr <= qsize && srcq[*qptr] != '"') {
-        (*qptr)++;
-      }
-
-      if (*qptr > qsize) { // unfinished str but ptr at end
+    case '-':
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_MINUS, *line);
+      break;
+    case '*':
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_MULTIPLY, *line);
+      break;
+    case '/':
+      put_token(
+          tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_DIVIDE, *line);
+      break;
+    case '(':
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_LPAREN, *line);
+      break;
+    case ')':
+      put_token(tokens, tokensptr, srcq, *qptr, start, 
+          TOKEN_RPAREN, *line);
+      break;
+    case ':':
+      if (srcq[*qptr] != '=') { // Invalid token
         char msg[ERROR_MAX_MSG];
         puterrmsg(
-            msg, "Unterminated String Literal", c, *line);
+            msg, "Unexpected token: :", srcq[*qptr], *line);
         puterr(&error, ERROR_RUNTIME, msg);
       }
       else {
-        put_token(
-            tokens, tokensptr, srcq, ++(*qptr), start, 
-            TOKEN_STRING, *line);
+        put_token(tokens, tokensptr, srcq, *qptr, start,
+            TOKEN_ASSIGN, *line);
       }
-
       break;
     default:
       if (isdigit(c)) { // Handle numeric literals
         // Read and iterate src queue while numeric.
         while (*qptr <= qsize && isdigit(srcq[(*qptr)++]))
           ;
-
-        // Handle floats
-        if (*qptr <= qsize && srcq[(*qptr)-1] == '.') {
-          while (*qptr <= qsize && isdigit(srcq[(*qptr)++]))
-            ;
-        }
-        (*qptr)--; // While loop had to lookahead
-
+        (*qptr)--;
         put_token( // Put the numeric literal token.
             tokens, tokensptr, srcq, *qptr, start,
             TOKEN_NUMBER, *line);
@@ -160,7 +138,7 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
         else { // Is an identifier
           put_token(
               tokens, tokensptr, srcq, *qptr, start, 
-              TOKEN_IDENTIFIER, *line);
+              TOKEN_IDENT, *line);
         }
         break;
       }
@@ -174,7 +152,7 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
       else {
         // Put Error
         char msg[ERROR_MAX_MSG];
-        puterrmsg(msg, "Unexpected Token", c, *line);
+        puterrmsg(msg, "unexpected token", c, *line);
         puterr(&error, ERROR_RUNTIME, msg);
         break;
       }

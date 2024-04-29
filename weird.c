@@ -2,28 +2,12 @@
  *  file: weird.c
  *
  *  brief:
- *    -An interpreter for a language called weird compiles the .we
- *    file using a tree-walk. implementation is influenced by the 
- *    book "crafting-interpreters" and consists of functions that
- *    do lexical analysis, parseing, and hopefully IR and 
- *    code gen. phases.
- *
- *    this repo consists of weird.c, weird.h and scan_token.h .
+ *    A PL/0 to C compiler front-end written in C.
  *    
- *    examples of the valid weird source code exist in this
- *    repository; their name ends with '.we'.
+ *    examples of the valid PL/0 source code exist in this
+ *    repository at lexertest/<name>.pl .
  *
  *  Author: Metflekx
- *
- *  todo:
- *    [*] Lexical Analysis:
- *      [*] Successfully tokenize a file consist of "!*+-/=<> <= == // ops".
- *      [*] Successfully tokenize string literals.
- *      [*] Successfully tokenize number literals.
- *      [*] Successfully tokenize res. keywords and identifiers.
- *      [*] for each token, keep track of line.
- *      [*] error should stdout token's line and lexeme.
- *      [*] Implement Repl.
  *
  *  References:
  *    Notes:

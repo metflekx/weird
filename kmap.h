@@ -84,31 +84,23 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h> // for hash function
 
 #define MAX_KEY 32
-#define kmap_SIZE 32
 
 typedef enum ETokenType {
-  // Single-char tokens.
-  TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
-  TOKEN_LEFT_BRACE, TOKEN_RIGHT_BRACE,
-  TOKEN_COMMA, TOKEN_DOT, TOKEN_MINUS, TOKEN_PLUS,
-  TOKEN_SEMICOLON, TOKEN_SLASH, TOKEN_STAR,
-  // One or two character tokens.
-  TOKEN_BANG, TOKEN_BANG_EQUAL,
-  TOKEN_EQUAL, TOKEN_EQUAL_EQUAL,
-  TOKEN_GREATER, TOKEN_GREATER_EQUAL,
-  TOKEN_LESS, TOKEN_LESS_EQUAL,
-  // Literals.
-  TOKEN_IDENTIFIER, TOKEN_STRING, TOKEN_NUMBER,
-  // Keywords.
-  TOKEN_AND, TOKEN_CLASS, TOKEN_ELSE, TOKEN_FALSE,
-  TOKEN_FOR, TOKEN_FUN, TOKEN_IF, TOKEN_NIL, TOKEN_OR,
-  TOKEN_PRINT, TOKEN_RETURN, TOKEN_SUPER, TOKEN_THIS,
-  TOKEN_TRUE, TOKEN_VAR, TOKEN_WHILE,
-  TOKEN_ERROR, TOKEN_EOF
-} ETokenType;
+  TOKEN_IDENT, TOKEN_NUMBER, TOKEN_CONST,
+  TOKEN_VAR, TOKEN_PROCEDURE, TOKEN_CALL,
+  TOKEN_BEGIN, TOKEN_END, TOKEN_IF, TOKEN_THEN, 
+  TOKEN_WHILE, TOKEN_DO, TOKEN_ODD, TOKEN_DOT, 
+  TOKEN_EQUAL, TOKEN_COMMA, TOKEN_SEMICOLON, 
+  TOKEN_ASSIGN, TOKEN_HASH, TOKEN_LESS, 
+  TOKEN_GREATER, TOKEN_PLUS, TOKEN_MINUS, 
+  TOKEN_MULTIPLY, TOKEN_DIVIDE, TOKEN_LPAREN, 
+  TOKEN_RPAREN} ETokenType;
+
+#define KMAPSIZ (TOKEN_ODD - TOKEN_VAR) + 1
 
 typedef struct keyword{
   char key[MAX_KEY];
@@ -116,7 +108,7 @@ typedef struct keyword{
   struct keyword *next;
 } Keyword;
 
-Keyword *kmap[kmap_SIZE];
+Keyword *kmap[KMAPSIZ];
 
 // Private functions
 unsigned int _hash(char *key);
@@ -129,7 +121,7 @@ Keyword *kmaplookup(Keyword *kmap[], char *query);
 Keyword *kmaprm(Keyword *kmap[], char *query);
 Keyword **kmapinit();
 
-/* Checksum _hash function */
+/* hash function */
 unsigned int _hash(char *key) {
   int p, a, b, k;
   srand(time(NULL));
@@ -137,7 +129,7 @@ unsigned int _hash(char *key) {
   p = 37; // prime number > universe
   a = rand() % p;
   b = rand() % p;
-  return ((a * k + b) % p) % kmap_SIZE;
+  return ((a * k + b) % p) % KMAPSIZ;
 }
 
 Keyword *_kword(char *key, ETokenType type) {
@@ -153,7 +145,7 @@ void _print(Keyword *kmap[]) {
   int i;
   Keyword *iterator;
 
-  for (i = 0; i < kmap_SIZE; i++) {
+  for (i = 0; i < KMAPSIZ; i++) {
     printf("%2.i\t", i);
     if(kmap[i]) {
       iterator = kmap[i];
@@ -171,7 +163,7 @@ void _print(Keyword *kmap[]) {
 
 /* Set all entries to point to NULL */
 void _initkmap(Keyword *kmap[]) {
-  for (int i = 0; i < kmap_SIZE; i++)
+  for (int i = 0; i < KMAPSIZ; i++)
     kmap[i] = NULL;
 }
 
@@ -243,13 +235,12 @@ Keyword *kmaprm(Keyword *kmap[], char *query) {
 /* initialize the kmap of weird legal keywords */
 Keyword **kmapinit() {
   int i, j;
-  char *kwords[18] = { // declare list of all kmaps
-    "and", "class", "else", "false", "for", "fun", "if",
-    "nil", "or", "print", "return", "super", "this",
-    "true", "var", "while", "error", "eof"};
+  char *kwords[11] = { // declare list of all kmaps
+    "var", "procedure", "call", "begin", "end", 
+    "if", "then", "while", "do", "odd"};
 
   _initkmap(kmap);
-  for (j = 0, i = TOKEN_AND; i <= TOKEN_EOF; j++, i++) {
+  for (j = 0, i = TOKEN_VAR; i <= TOKEN_ODD; j++, i++) {
     kmapput(kmap, _kword(kwords[j], i));
   }
   return kmap;
