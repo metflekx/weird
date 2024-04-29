@@ -98,9 +98,7 @@ typedef enum ETokenType {
   TOKEN_ASSIGN, TOKEN_HASH, TOKEN_LESS, 
   TOKEN_GREATER, TOKEN_PLUS, TOKEN_MINUS, 
   TOKEN_MULTIPLY, TOKEN_DIVIDE, TOKEN_LPAREN, 
-  TOKEN_RPAREN} ETokenType;
-
-#define KMAPSIZ (TOKEN_ODD - TOKEN_VAR) + 1
+  TOKEN_RPAREN, KMAPSIZ} ETokenType;
 
 typedef struct keyword{
   char key[MAX_KEY];
