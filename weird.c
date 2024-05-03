@@ -6,6 +6,9 @@
  *    
  *    examples of the valid PL/0 source code exist in this
  *    repository at lexertest/<name>.pl .
+ *    Lexer module works independently by reading the file
+ *    and puting tokens into an array. parser then takes
+ *    array as an argument.
  *
  *  Author: Metflekx
  *
@@ -16,9 +19,12 @@
  *      char msg[ERROR_MAX_MSG];
  *      puterrmsg(msg, "Unexpected Token", c, *line);
  *      puterr(&error, ERROR_RUNTIME, msg);
+ *
+ *  TODO:
+ *    [ ] Implement parser.
  * */
 
-#include "weird.h"
+#include "parser.h"
 
 /* Creates a Token { struct token } put the right values in it 
  * and the newly created token into tokens[] */
@@ -55,7 +61,8 @@ Error *scan_tokens(Token tokens[], int *tokensptr, char *srcq,
   while (qptr <= qsize) { // while not queue end
     start = qptr;
     if ((error = scan_token(
-            tokens, tokensptr, srcq, &qptr, qsize, start, &line)) != ok) {
+            tokens, tokensptr, srcq,\
+            &qptr, qsize, start, &line)) != ok) {
       throwerr(error);
     }
   }
@@ -75,6 +82,9 @@ void run(char *srcq, int qsize) {
   if ((error = scan_tokens(
           tokens, &tokensptr, srcq, qsize)) != ok)
     throwerr(error);
+
+  // parse newly populated queue of tokens
+  parse(tokens, tokensptr);
 }
 
 /* Compile and runs the code in a file */

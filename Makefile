@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 EXEC=weird
 OBJS=weird.o
 
 all: $(EXEC)
 # Make Objects
-$(OBJS): weird.c weird.h scan_token.h kmap.h
+$(OBJS): weird.c weird.h scan_token.h kmap.h parser.h
 # Make Executables
 $(EXEC): $(OBJS)
 clean:

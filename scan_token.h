@@ -99,7 +99,7 @@ Error *scan_token(Token tokens[], int *tokensptr, char *srcq,
         puterr(&error, ERROR_RUNTIME, msg);
       }
       else {
-        put_token(tokens, tokensptr, srcq, *qptr, start,
+        put_token(tokens, tokensptr, srcq, ++(*qptr), start,
             TOKEN_ASSIGN, *line);
       }
       break;

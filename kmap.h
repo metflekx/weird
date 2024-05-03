@@ -78,7 +78,6 @@
 *
 */
 
-
 #ifndef kmap_h
 #define kmap_h
 
@@ -233,12 +232,13 @@ Keyword *kmaprm(Keyword *kmap[], char *query) {
 /* initialize the kmap of weird legal keywords */
 Keyword **kmapinit() {
   int i, j;
-  char *kwords[11] = { // declare list of all kmaps
-    "var", "procedure", "call", "begin", "end", 
-    "if", "then", "while", "do", "odd"};
+  char *kwords[12] = { // declare list of all kmaps
+    "const", "var", "procedure", "call", 
+    "begin", "end", "if", "then", "while", 
+    "do", "odd"};
 
   _initkmap(kmap);
-  for (j = 0, i = TOKEN_VAR; i <= TOKEN_ODD; j++, i++) {
+  for (j = 0, i = TOKEN_CONST; i <= TOKEN_ODD; j++, i++) {
     kmapput(kmap, _kword(kwords[j], i));
   }
   return kmap;

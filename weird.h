@@ -105,7 +105,8 @@ Error *ok = NULL;
 
 /* Generates error readable error msg puts into src.
  * Just a few boring stdlib calls. */
-void puterrmsg(char src[], char *msg, char token, int line) {
+void puterrmsg(
+    char src[], char *msg, char token, int line) {
   char buff[10];
   int i = 0;
   strcpy(src, msg); //"Unexpected Token: \'");
