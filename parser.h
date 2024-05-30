@@ -53,6 +53,9 @@ void condition(Token tokens[], int size) {
 
   gensymbol(tokens, parserptr);
   switch (tokens[parserptr].type) {
+    char msg[ERROR_MAX_MSG]; // error msg buff
+    Error *error = ok; // init error
+
     case TOKEN_ODD:
       match(tokens[parserptr++], TOKEN_ODD);
       expression(tokens, size);
@@ -69,17 +72,14 @@ void condition(Token tokens[], int size) {
     case TOKEN_GREATER:
       match(tokens[parserptr++], TOKEN_GREATER);
       break;
-  
     default: // error and exit
-    char msg[ERROR_MAX_MSG];
-    Error *error = ok;
-    puterrmsg(
-        msg, "expected condition got: ", 
-        tokens[parserptr].lexeme[0], 
-        tokens[parserptr].line);
-    puterr(&error, ERROR_RUNTIME, msg);
-    throwerr(error);
-    break;
+      puterrmsg(
+          msg, "expected condition got: ", 
+          tokens[parserptr].lexeme[0], 
+          tokens[parserptr].line);
+      puterr(&error, ERROR_RUNTIME, msg);
+      throwerr(error);
+      break;
   }
 
   expression(tokens, size);
@@ -88,6 +88,9 @@ void condition(Token tokens[], int size) {
 /* parses a factor */
 void factor(Token tokens[], int size) {
   switch (tokens[parserptr].type) {
+    char msg[ERROR_MAX_MSG];
+    Error *error = ok;
+
     case (TOKEN_IDENT):
     case (TOKEN_NUMBER):
       gensymbol(tokens, parserptr);
@@ -107,15 +110,13 @@ void factor(Token tokens[], int size) {
       break;
 
     default: // error and exit
-    char msg[ERROR_MAX_MSG];
-    Error *error = ok;
-    puterrmsg(
-        msg, "expected factor got: ", 
-        tokens[parserptr].lexeme[0], 
-        tokens[parserptr].line);
-    puterr(&error, ERROR_RUNTIME, msg);
-    throwerr(error);
-    break;
+      puterrmsg(
+          msg, "expected factor got: ", 
+          tokens[parserptr].lexeme[0], 
+          tokens[parserptr].line);
+      puterr(&error, ERROR_RUNTIME, msg);
+      throwerr(error);
+      break;
   }
 }
 
