@@ -52,10 +52,11 @@ void condition(Token tokens[], int size) {
   expression(tokens, size);
 
   gensymbol(tokens, parserptr);
-  switch (tokens[parserptr].type) {
-    char msg[ERROR_MAX_MSG]; // error msg buff
-    Error *error = ok; // init error
 
+  char msg[ERROR_MAX_MSG]; // error msg buff
+  Error *error = ok; // init error
+  
+  switch (tokens[parserptr].type) {
     case TOKEN_ODD:
       match(tokens[parserptr++], TOKEN_ODD);
       expression(tokens, size);
@@ -87,10 +88,10 @@ void condition(Token tokens[], int size) {
 
 /* parses a factor */
 void factor(Token tokens[], int size) {
-  switch (tokens[parserptr].type) {
-    char msg[ERROR_MAX_MSG];
-    Error *error = ok;
+  char msg[ERROR_MAX_MSG]; // init error msg buf
+  Error *error = ok; // init error
 
+  switch (tokens[parserptr].type) {
     case (TOKEN_IDENT):
     case (TOKEN_NUMBER):
       gensymbol(tokens, parserptr);
